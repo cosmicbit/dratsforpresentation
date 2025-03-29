@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<edges>
+    <!-- North direction: an incoming edge from N to TL1 and an outgoing edge from TL1 to N -->
+    <edge id="edge_n1_in" from="N1" to="TL1" numLanes="2" speed="13.9" priority="1"/>
+    <edge id="edge_n1_out" from="TL1" to="N1" numLanes="2" speed="13.9" priority="1"/>
+
+    <edge id="edge_n2_in" from="N2" to="TL2" numLanes="2" speed="13.9" priority="1"/>
+    <edge id="edge_n2_out" from="TL2" to="N2" numLanes="2" speed="13.9" priority="1"/>
+
+    <!-- South direction: an incoming edge from S to TL1 and an outgoing edge from TL1 to S -->
+    <edge id="edge_s1_in" from="S1" to="TL1" numLanes="2" speed="13.9" priority="1"/>
+    <edge id="edge_s1_out" from="TL1" to="S1" numLanes="2" speed="13.9" priority="1"/>
+
+    <edge id="edge_s2_in" from="S2" to="TL2" numLanes="2" speed="13.9" priority="1"/>
+    <edge id="edge_s2_out" from="TL2" to="S2" numLanes="2" speed="13.9" priority="1"/>
+
+    <!-- East direction: an incoming edge from E to TL1 and an outgoing edge from TL1 to E -->
+    <edge id="edge_e_in" from="E" to="TL2" numLanes="2" speed="13.9" priority="1"/>
+    <edge id="edge_e_out" from="TL2" to="E" numLanes="2" speed="13.9" priority="1"/>
+
+    <!-- West direction: an incoming edge from W to TL1 and an outgoing edge from TL1 to W -->
+    <edge id="edge_w_in" from="W" to="TL1" numLanes="2" speed="13.9" priority="1"/>
+    <edge id="edge_w_out" from="TL1" to="W" numLanes="2" speed="13.9" priority="1"/>
+
+    <edge id="edge_m_1_2" from="TL1" to="TL2" numLanes="2" speed="13.9" priority="1"/>
+    <edge id="edge_m_2_1" from="TL2" to="TL1" numLanes="2" speed="13.9" priority="1"/>
+</edges>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nodes>
+    <!-- Four peripheral nodes (used as origins/destinations) -->
+    <node id="N" x="500.0" y="1000.0" type="priority"/>
+    <node id="S" x="500.0" y="0.0" type="priority"/>
+    <node id="E" x="1000.0" y="500.0" type="priority"/>
+    <node id="W" x="0.0" y="500.0" type="priority"/>
+    <!-- Central intersection node with a traffic light -->
+    <node id="TL1" x="500.0" y="500.0" type="traffic_light"/>
+</nodes>
