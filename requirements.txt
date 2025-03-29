@@ -1,0 +1,8 @@
+gym
+numpy
+torch
+traci
+sumo
+matplotlib
+streamlit
+pandas
