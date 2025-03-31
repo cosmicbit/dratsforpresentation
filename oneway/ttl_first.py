@@ -1,39 +1,20 @@
 import os
 import sys
-import gym
 import numpy as np
 from gym import spaces
+import traci
 
-from oneway.visualization import Visualization
 
 # Set SUMO_HOME and update system path (adjust the path if needed)
 if "SUMO_HOME" not in os.environ:
     os.environ["SUMO_HOME"] = "/usr/share/sumo"
 sys.path.append(os.path.join(os.environ["SUMO_HOME"], "tools"))
-import traci
 
 
-class FixedTimeEnv(gym.Env):
-    """
-    A SUMO-based Gym environment that uses SUMO's built-in fixed-time (traditional) traffic light logic.
 
-    Assumes a four-way intersection with:
-      - Four incoming lanes with IDs: "edge_n_in_0", "edge_s_in_0", "edge_e_in_0", and "edge_w_in_0".
-      - A traffic light junction "TL1" defined in your network file.
-
-    The state vector is:
-        [veh_n, veh_s, veh_e, veh_w, current_phase]
-    where veh_* is the vehicle count on the corresponding incoming lane,
-    and current_phase is the current phase of the traffic light.
-
-    Since the fixed-time controller does not intervene (the tlLogic is predefined),
-    no actions are taken. The simulation simply advances.
-
-    Reward (optional): negative sum of vehicle counts (for logging purposes).
-    """
+class FixedTimeEnv():
 
     def __init__(self, sumo_cmd, max_steps):
-        super(FixedTimeEnv, self).__init__()
         self.sumo_cmd = sumo_cmd
         self.max_steps = max_steps
         self.observation_space = spaces.Box(low=0, high=100, shape=(5,), dtype=np.float32)
@@ -57,7 +38,6 @@ class FixedTimeEnv(gym.Env):
 
     def _get_state(self):
         trafficlights = traci.trafficlight.getIDList()
-        halted_counts = []  # Halted vehicle counts for each lane
         densities = []  # Normalized traffic density for each lane
 
         # Estimated average vehicle length in meters (adjust as needed)
@@ -69,9 +49,6 @@ class FixedTimeEnv(gym.Env):
         controlled_lanes.sort()  # Optional: sort for consistency
 
         for lane in controlled_lanes:
-            # Get the number of halted vehicles on this lane
-            halted = traci.lane.getLastStepHaltingNumber(lane)
-            halted_counts.append(halted)
 
             # Get the total number of vehicles on this lane
             vehicle_count = traci.lane.getLastStepVehicleNumber(lane)
@@ -107,12 +84,6 @@ class FixedTimeEnv(gym.Env):
         densities = np.array(state[:num_lanes])
         # total_halt = np.sum(halted_counts)
         avg_density = np.mean(densities) if densities.size > 0 else 0.0
-
-        # nonzero_halts = []
-        # for halts, density in zip(halted_counts, densities):
-        #     if halts > 0:
-        #         norm_halt = halts * density
-        #         nonzero_halts.append(norm_halt)
         reference_density = 0.3
         std_dev = np.std(densities) if len(densities) > 0 else 0.0
         beta = 0.5  # reduced from 0.5 to soften the penalty slightly
@@ -129,22 +100,15 @@ class FixedTimeEnv(gym.Env):
             traci.close()
 
 
-def run_simulation(sumo_cmd = ["sumo-gui", "-c", "oneway/one_intersection/simple_intersection.sumocfg"], total_steps=1000, print_interval=50):
+def run_simulation(sumo_cmd = ["sumo-gui", "-c", "oneway/one_intersection/first.sumocfg"], total_steps=1000):
     env = FixedTimeEnv(sumo_cmd, max_steps=total_steps)
     state = env.reset()
     rewards = []
-    # throughput_list = []    # Cumulative throughput over simulation.
     waiting_time_list = []  # Average waiting time per step.
-    cumulative_throughput = 0
     print("Starting Fixed-Time (TTL) Simulation")
     for step in range(total_steps):
-        state, reward, done, _ = env.step()
+        _, reward, done, _ = env.step()
         rewards.append(reward)
-
-        # Throughput: Count vehicles that arrived in this simulation step.
-        # arrived_ids = traci.simulation.getArrivedIDList()
-        # cumulative_throughput += len(arrived_ids)
-        # throughput_list.append(cumulative_throughput)
 
         # Waiting time: Compute the average waiting time for all vehicles currently in simulation.
         veh_ids = traci.vehicle.getIDList()
@@ -153,10 +117,6 @@ def run_simulation(sumo_cmd = ["sumo-gui", "-c", "oneway/one_intersection/simple
         else:
             avg_wait = 0.0
         waiting_time_list.append(avg_wait)
-
-        if step % print_interval == 0:
-            print(f"Step {step}: State = {state}, Reward = {reward}, "
-                  f"Avg Waiting Time = {avg_wait:.2f}")
         if done:
             break
 
@@ -165,16 +125,10 @@ def run_simulation(sumo_cmd = ["sumo-gui", "-c", "oneway/one_intersection/simple
     mean_wait = np.mean(waiting_time_list)
     print("Simulation Completed.")
     print(f"Total Reward: {total_reward:.2f}")
-    # print(f"Final Cumulative Throughput: {cumulative_throughput}")
     print(f"Mean Waiting Time: {mean_wait:.2f}")
-
-    viz = Visualization()
-    viz.save_data_and_plot(data=rewards, filename='ROT TTL', xlabel='Timesteps', ylabel='Cumulative Negative Reward')
-    # viz.save_data_and_plot(data=throughput_list, filename='Throughput_TTL', xlabel='Timesteps', ylabel='Cumulative Throughput')
-    viz.save_data_and_plot(data=waiting_time_list, filename='WaitingTime_TTL', xlabel='Timesteps', ylabel='Average Waiting Time')
     return rewards, waiting_time_list
 
 if __name__ == "__main__":
     # Use SUMO-gui mode for visualization; adjust the config file as needed.
-    sumo_cmd = ["sumo-gui", "-c", "one_intersection/simple_intersection.sumocfg"]
+    sumo_cmd = ["sumo-gui", "-c", "one_intersection/first.sumocfg"]
     run_simulation(sumo_cmd, total_steps=1000, print_interval=50)

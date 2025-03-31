@@ -1,6 +1,0 @@
-<additional>
-    <inductionLoop id="detector1" lane="edge_n_in_0" pos="450" length="20" freq="1" file="detector_output.xml"/>
-    <inductionLoop id="detector2" lane="edge_e_in_0" pos="450" length="5" freq="1" file="detector_output.xml"/>
-    <inductionLoop id="detector3" lane="edge_s_in_0" pos="450" length="5" freq="1" file="detector_output.xml"/>
-    <inductionLoop id="detector4" lane="edge_w_in_0" pos="450" length="5" freq="1" file="detector_output.xml"/>
-</additional>

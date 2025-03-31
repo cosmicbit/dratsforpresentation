@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <routes>
     <!-- Define a vehicle type -->
-    <vType id="car" accel="1.0" decel="4.5" sigma="0.5" length="5.0" minGap="2.5" maxSpeed="13.9"/>
+    <vType id="standard_car" accel="1.0" decel="4.5" sigma="0.5" length="5.0" minGap="2.5" maxSpeed="13.9"/>
 
     <!-- Define routes through the intersection -->
     <!-- Example Route 1: Vehicles coming from North and exiting to East -->
@@ -21,21 +21,15 @@
     <route id="S_to_E" edges="edge_s_in edge_e_out"/>
     <route id="S_to_W" edges="edge_s_in edge_w_out"/>
 
-    <!-- Define flows for these routes -->
-    <flow id="flow1" type="car" route="N_to_E" begin="0" end="1000" vehsPerHour="600"/>
-    <flow id="flow2" type="car" route="N_to_S" begin="0" end="1000" vehsPerHour="600"/>
-    <flow id="flow3" type="car" route="N_to_W" begin="0" end="1000" vehsPerHour="600"/>
-    <!--
-    <flow id="flow4" type="car" route="W_to_N" begin="0" end="1000" vehsPerHour="600"/>
-    <flow id="flow5" type="car" route="W_to_E" begin="0" end="1000" vehsPerHour="600"/>
-    <flow id="flow6" type="car" route="W_to_S" begin="0" end="1000" vehsPerHour="600"/>
+    <vehicle id="E_W_0" type="standard_car" route="N_to_E" depart="0.0" departLane="random" departSpeed="10" />
+    <vehicle id="W_E_1" type="standard_car" route="W_to_N" depart="50.0" departLane="random" departSpeed="10" />
+    <vehicle id="S_N_2" type="standard_car" route="E_to_N" depart="100.0" departLane="random" departSpeed="10" />
+    <vehicle id="W_E_3" type="standard_car" route="S_to_N" depart="150.0" departLane="random" departSpeed="10" />
+    <vehicle id="N_E_4" type="standard_car" route="N_to_S" depart="200.0" departLane="random" departSpeed="10" />
+    <vehicle id="W_N_5" type="standard_car" route="W_to_E" depart="250.0" departLane="random" departSpeed="10" />
+    <vehicle id="N_S_6" type="standard_car" route="E_to_S" depart="300.0" departLane="random" departSpeed="10" />
+    <vehicle id="W_S_7" type="standard_car" route="S_to_E" depart="350.0" departLane="random" departSpeed="10" />
+    <vehicle id="W_E_8" type="standard_car" route="N_to_W" depart="400.0" departLane="random" departSpeed="10" />
+    <vehicle id="E_W_9" type="standard_car" route="E_to_W" depart="450.0" departLane="random" departSpeed="10" />
 
-    <flow id="flow7" type="car" route="E_to_N" begin="0" end="1000" vehsPerHour="600"/>
-    <flow id="flow8" type="car" route="E_to_S" begin="0" end="1000" vehsPerHour="600"/>
-    <flow id="flow9" type="car" route="E_to_W" begin="0" end="1000" vehsPerHour="600"/>
-
-    <flow id="flow10" type="car" route="S_to_N" begin="0" end="1000" vehsPerHour="600"/>
-    <flow id="flow11" type="car" route="S_to_E" begin="0" end="1000" vehsPerHour="600"/>
-    <flow id="flow12" type="car" route="S_to_W" begin="0" end="1000" vehsPerHour="600"/>
-    -->
 </routes>

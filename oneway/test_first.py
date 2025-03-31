@@ -1,11 +1,9 @@
 import numpy as np
 import torch
-from oneway.agent import DQNAgent
+from oneway.agent_first import DQNAgent
 import gym
 import traci
 from gym import spaces
-
-from oneway.visualization import Visualization
 
 
 ##############################
@@ -144,8 +142,8 @@ class SUMOTrafficEnv(gym.Env):
             traci.close()
 
 
-def test_agent(sumo_cmd = ["sumo-gui", "-c", "oneway/one_intersection/simple_intersection.sumocfg"],
-               episodes=1, print_interval=50):
+def test_agent(sumo_cmd = ["sumo-gui", "-c", "oneway/one_intersection/first.sumocfg"],
+               episodes=1):
     """
     Runs the trained agent for a given number of episodes and measures:
       - Rewards (as before)
@@ -158,7 +156,7 @@ def test_agent(sumo_cmd = ["sumo-gui", "-c", "oneway/one_intersection/simple_int
     duration_n = 3
     # print("action_n", action_n)
     loaded_agent = DQNAgent(state_dim, phase_n, duration_n)
-    loaded_agent.q_network.load_state_dict(torch.load("oneway/models/dqn_fourway_model_multidiscrete.pth",
+    loaded_agent.q_network.load_state_dict(torch.load("oneway/models/first_model.pth",
                                                       map_location=loaded_agent.device))
     loaded_agent.update_target_network()
     loaded_agent.epsilon = 0.0
@@ -176,22 +174,12 @@ def test_agent(sumo_cmd = ["sumo-gui", "-c", "oneway/one_intersection/simple_int
             action = loaded_agent.act(state)
             state, reward, done, info = env.step(action)
             rewards.append(reward)
-
-            # Throughput: Count vehicles that arrived in this simulation step.
-            # arrived_ids = traci.simulation.getArrivedIDList()
-            # cumulative_throughput += len(arrived_ids)
-            # throughput_list.append(cumulative_throughput)
-
-            # Waiting time: Compute the average waiting time for all vehicles currently in simulation.
             veh_ids = traci.vehicle.getIDList()
             if veh_ids:
                 avg_wait = np.mean([traci.vehicle.getWaitingTime(veh) for veh in veh_ids])
             else:
                 avg_wait = 0.0
             waiting_time_list.append(avg_wait)
-
-            if step % print_interval == 0:
-                print(f"Step {step}: State = {state}, Reward = {reward}, Avg Waiting Time = {avg_wait:.2f}")
 
         total_reward = np.sum(rewards)
         print(f"Test Episode {ep + 1} completed.")
@@ -200,16 +188,10 @@ def test_agent(sumo_cmd = ["sumo-gui", "-c", "oneway/one_intersection/simple_int
         print(f"Mean Waiting Time: {np.mean(waiting_time_list):.2f}")
     env.close()
 
-    viz = Visualization()
-    viz.save_data_and_plot(data=rewards, filename='ROT_testing', xlabel='Timesteps',
-                           ylabel='Cumulative Negative Reward')
-    # viz.save_data_and_plot(data=throughput_list, filename='Throughput_testing', xlabel='Timesteps', ylabel='Cumulative Throughput')
-    viz.save_data_and_plot(data=waiting_time_list, filename='WaitingTime_testing', xlabel='Timesteps',
-                           ylabel='Average Waiting Time')
     return rewards, waiting_time_list
 
 if __name__ == "__main__":
-    sumo_cmd = ["sumo-gui", "-c", "one_intersection/simple_intersection.sumocfg"]
+    sumo_cmd = ["sumo-gui", "-c", "one_intersection/first.sumocfg"]
     rewards, waiting_time_list = test_agent(sumo_cmd, episodes=1)
     ttl.run_simulation(sumo_cmd, total_steps=1000, print_interval=50)
 
